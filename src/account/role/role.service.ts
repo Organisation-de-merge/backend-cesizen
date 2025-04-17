@@ -10,4 +10,11 @@ export class RoleService {
       include: { users: true },
     });
   }
+
+  findById(id: number) {
+    return this.prisma.role.findUnique({
+      where: { id },
+      include: { users: true },
+    });
+  }
 }
