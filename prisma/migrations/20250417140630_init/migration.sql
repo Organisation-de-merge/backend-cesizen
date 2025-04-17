@@ -5,7 +5,7 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "roleId" INTEGER NOT NULL,
-    "status" BOOLEAN NOT NULL DEFAULT true,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
     "deletedAt" TIMESTAMP(3),
@@ -31,7 +31,7 @@ VALUES  (1, 'Administrateur', 100, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL),
         (2, 'Utilisateur', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
 
 -- InsertUser
-INSERT INTO "User" ("email", "name", "password", "roleId", "status", "createdAt", "updatedAt", "deletedAt")
+INSERT INTO "User" ("email", "name", "password", "roleId", "isActive", "createdAt", "updatedAt", "deletedAt")
 VALUES  ('admin@cesizen.fr', 'Administrateur CESIZEN', '$2b$04$f3IyvUS3CljWqHcHE6q2EeQ67k2JajGImbvPopBBCL6FPsAy8il0q', 1, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL),
         ('mathis.ternon@gmail.com', 'Administrateur Ternon', '$2b$04$9vuq/R9oH1UKPCfHSnvOq.LAxlyWXSTgYR.HuUX039ln/ZptX0BZK', 2, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
 
