@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+///////////////////////////////
+// Module Compte utilisateur //
+///////////////////////////////
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String
+  password  String
+  roleId    Int
+  role      Role?     @relation("roleUser", fields: [roleId], references: [id])
+  status    Boolean   @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+}
+
+model Role {
+  id        Int       @id @default(autoincrement())
+  label     String
+  level     Int
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+  users     User[]    @relation("roleUser")
+}
