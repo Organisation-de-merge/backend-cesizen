@@ -25,16 +25,6 @@ CREATE TABLE "Role" (
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
 
--- InsertRole
-INSERT INTO "Role" ("id","label", "level", "createdAt", "updatedAt", "deletedAt")
-VALUES  (1, 'Administrateur', 100, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL),
-        (2, 'Utilisateur', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
-
--- InsertUser
-INSERT INTO "User" ("email", "name", "password", "roleId", "isActive", "createdAt", "updatedAt", "deletedAt")
-VALUES  ('admin@cesizen.fr', 'Administrateur CESIZEN', '$2b$04$f3IyvUS3CljWqHcHE6q2EeQ67k2JajGImbvPopBBCL6FPsAy8il0q', 1, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL),
-        ('mathis.ternon@gmail.com', 'Administrateur Ternon', '$2b$04$9vuq/R9oH1UKPCfHSnvOq.LAxlyWXSTgYR.HuUX039ln/ZptX0BZK', 2, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 

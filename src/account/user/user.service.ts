@@ -13,7 +13,9 @@ export class UserService {
       where: {
         role: {
           level: {
-            not: 100,
+            not: {
+              gte: 50,
+            },
           },
         },
       },
@@ -35,7 +37,9 @@ export class UserService {
         isActive: true,
         role: {
           level: {
-            not: 100,
+            not: {
+              gte: 50,
+            },
           },
         },
       },
@@ -57,7 +61,9 @@ export class UserService {
         isActive: false,
         role: {
           level: {
-            not: 100,
+            not: {
+              gte: 50,
+            },
           },
         },
       },

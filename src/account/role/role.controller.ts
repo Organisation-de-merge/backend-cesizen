@@ -4,8 +4,16 @@ import { RoleService } from './role.service';
 import { RoleResponseDto } from './dto/role.response.dto';
 import { CreateRoleDto } from './dto/role.create.dto';
 import { UpdateRoleDto } from './dto/role.update.dto';
+import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
+import { RolesGuard } from '../../common/guard/role.guard';
+import { MinRoleLevel } from '../../common/decorators/roles.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common';
 
 @ApiTags('Roles')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@MinRoleLevel(100)
+@ApiBearerAuth()
 @Controller('roles')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}

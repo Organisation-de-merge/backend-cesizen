@@ -33,3 +33,34 @@ model Role {
   deletedAt     DateTime?
   users         User[]    @relation("roleUser")
 }
+
+///////////////////////////////
+// Module Page d'information //
+///////////////////////////////
+
+model InformationPage {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  thumbnail   String?
+  status      PageStatus  @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model InformationMenu {
+  id        Int    @id @default(autoincrement())
+  label     String
+  pageIds   Int[] 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PageStatus {
+  DRAFT     
+  HIDDEN    
+  PUBLISHED 
+}
+
+seed = "ts-node prisma/seed.ts"
