@@ -152,4 +152,23 @@ export class UserService {
       },
     });
   }
+
+  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+  
+    if (!user) {
+      throw new Error("Utilisateur introuvable");
+    }
+  
+    const match = await bcrypt.compare(oldPassword, user.password);
+    if (!match) {
+      throw new Error('Ancien mot de passe incorrect');
+    }
+  
+    const newHash = await bcrypt.hash(newPassword, 10);
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { password: newHash },
+    });
+  }
 }

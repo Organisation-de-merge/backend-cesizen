@@ -1,15 +1,22 @@
-import { Body, Controller, Get, Post, Put, Delete, Param, ParseIntPipe, ParseBoolPipe, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Patch, Delete, Param, ParseIntPipe, ParseBoolPipe, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/user.create.dto';
 import { UserResponseDto } from './dto/user.response.dto';
 import { UpdateUserDto } from './dto/user.update.dto';
+import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
+import { RolesGuard } from '../../common/guard/role.guard';
+import { MinRoleLevel } from '../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(1)
   @Get('/getUsers')
   @ApiOperation({ 
     summary: 'Lister tous les utilisateurs', 
@@ -28,6 +35,8 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(1)
   @Get('/getUsersByStatus')
   @ApiOperation({ 
     summary: 'Lister tous les utilisateurs en fonction de leur statut',
@@ -58,6 +67,8 @@ export class UserController {
       : this.userService.findAllInactive();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(1)
   @Get('/getUserById/:id')
   @ApiOperation({ 
     summary: 'Récupérer un utilisateur par ID',
@@ -80,6 +91,8 @@ export class UserController {
     return this.userService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(100)
   @Post('/createUser')
   @ApiOperation({ 
     summary: 'Créer un nouvel utilisateur',
@@ -98,6 +111,8 @@ export class UserController {
     return this.userService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(100)
   @Put('/updateUser/:id')
   @ApiOperation({ 
     summary: 'Modifier un utilisateur',
@@ -123,6 +138,8 @@ export class UserController {
     return this.userService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(80)
   @Delete('/disableUser/:id')
   @ApiOperation({ 
     summary: 'Désactiver un utilisateur',
@@ -145,6 +162,8 @@ export class UserController {
     return this.userService.disable(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(80)
   @Put('/restoreUser/:id')
   @ApiOperation({ 
     summary: 'Restaurer un utilisateur désactivé',
@@ -167,6 +186,8 @@ export class UserController {
     return this.userService.restore(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(100)
   @Delete('/deleteUser/:id')
   @ApiOperation({
     summary: 'Supprimer un utilisateur',
@@ -187,5 +208,50 @@ export class UserController {
   })
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.userService.delete(id);
+  }
+}
+
+@ApiTags('Profil')
+@Controller('profil')
+export class ProfileController {
+  constructor(private readonly userService: UserService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('/profil')
+  @ApiOperation({ summary: 'Voir son propre profil' })
+  @ApiResponse({ status: 200, description: 'Données utilisateur récupérées' })
+  getProfile(@CurrentUser() user) {
+    return this.userService.findById(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Put('/profil/update')
+  @ApiOperation({ summary: 'Mettre à jour ses informations personnelles' })
+  @ApiResponse({ status: 200, description: 'Infos mises à jour' })
+  updateMe(@CurrentUser() user, @Body() dto: UpdateUserDto) {
+    return this.userService.update(user.id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('/profil/change-password')
+  @ApiOperation({ summary: 'Changer son mot de passe' })
+  @ApiResponse({ status: 200, description: 'Mot de passe modifié' })
+  async changePassword(
+    @CurrentUser() user,
+    @Body() body: { oldPassword: string; newPassword: string },
+  ) {
+    return this.userService.changePassword(user.id, body.oldPassword, body.newPassword);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Delete('/profil/delete')
+  @ApiOperation({ summary: 'Supprimer définitivement son compte' })
+  @ApiResponse({ status: 200, description: 'Compte supprimé' })
+  deleteSelf(@CurrentUser() user) {
+    return this.userService.delete(user.id);
   }
 }
