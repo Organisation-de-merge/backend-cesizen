@@ -8,9 +8,9 @@ async function main() {
 
   await prisma.role.createMany({
     data: [
-      { label: 'Administrateur', level: 100 },
-      { label: 'Modérateur', level: 80 },
-      { label: 'Utilisateur', level: 1 },
+      { id: 1, label: 'Administrateur', level: 100 },
+      { id: 2, label: 'Modérateur', level: 80 },
+      { id: 3, label: 'Utilisateur', level: 1 },
     ],
     skipDuplicates: true,
   });
@@ -66,12 +66,60 @@ async function main() {
     },
   });
 
-
   await prisma.informationMenu.create({
     data: {
       label: 'Menu Principal',
       pageIds: [1],
     },
+  });
+
+  await prisma.activityType.createMany({
+    data: [
+      { label: 'Yoga' },
+      { label: 'Méditation' },
+      { label: 'Respiration' },
+    ],
+    skipDuplicates: true,
+  });
+
+  await prisma.activity.createMany({
+    data: [
+      {
+        name: 'Yoga Matinal',
+        description: 'Séance de yoga pour bien commencer la journée.',
+        thumbnail: 'yoga.jpg',
+        duration: 30,
+        stressLevel: 2,
+        status: 'PUBLISHED',
+        typeId: 1,
+        publicationDate: new Date(),
+      },
+      {
+        name: 'Méditation guidée',
+        description: 'Détente mentale et relaxation profonde.',
+        thumbnail: 'meditation.jpg',
+        duration: 15,
+        stressLevel: 1,
+        status: 'PUBLISHED',
+        typeId: 2,
+        publicationDate: new Date(),
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  await prisma.favorite.createMany({
+    data: [
+      {
+        userId: 3, 
+        activityId: 1,
+      },
+      {
+        userId: 4, 
+        activityId: 2,
+      },
+    ],
+    skipDuplicates: true,
   });
 
   console.log('Base de données peuplée avec succès !');
