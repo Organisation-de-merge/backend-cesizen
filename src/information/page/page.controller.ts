@@ -10,29 +10,10 @@ import { MinRoleLevel } from '../../common/decorators/roles.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Pages')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@MinRoleLevel(100)
 @ApiBearerAuth()
 @Controller('pages')
 export class PageController {
   constructor(private readonly pageService: PageService) {}
-
-  @Post('/pages/createPage')
-  @ApiOperation({ 
-    summary: 'Créer une page d’information',
-    description: 'Crée une nouvelle page d’information dans le système.'
-  })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Page créée avec succès.', 
-    type: [ResponsePageDto]})
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Erreur de validation.' 
-  })
-  create(@Body() dto: CreatePageDto) {
-    return this.pageService.create(dto);
-  }
 
   @Get('/pages')
   @ApiOperation({ 
@@ -88,6 +69,27 @@ export class PageController {
     return this.pageService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(100)
+  @Post('/pages/createPage')
+  @ApiOperation({ 
+    summary: 'Créer une page d’information',
+    description: 'Crée une nouvelle page d’information dans le système.'
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Page créée avec succès.', 
+    type: [ResponsePageDto]})
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Erreur de validation.' 
+  })
+  create(@Body() dto: CreatePageDto) {
+    return this.pageService.create(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(100)
   @Put('/pages/:id')
   @ApiOperation({ 
     summary: 'Modifier une page',
@@ -106,6 +108,8 @@ export class PageController {
     return this.pageService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @MinRoleLevel(100)
   @Delete('/pages/:id')
   @ApiOperation({ 
     summary: 'Supprimer une page',
