@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RoleService } from './role.service';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { RoleResponseDto } from './dto/role.response.dto';
+import { CreateRoleDto } from './dto/role.create.dto';
+import { UpdateRoleDto } from './dto/role.update.dto';
 
 @ApiTags('Roles')
 @Controller('roles')
@@ -16,7 +17,8 @@ export class RoleController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Liste récupérée avec succès.' 
+    description: 'Liste récupérée avec succès.', 
+    type: [RoleResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -33,7 +35,8 @@ export class RoleController {
   })
   @ApiResponse({
     status: 200, 
-    description: 'Liste récupérée avec succès.' 
+    description: 'Liste récupérée avec succès.',
+    type: [RoleResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -50,7 +53,8 @@ export class RoleController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Liste récupérée avec succès.' 
+    description: 'Liste récupérée avec succès.',
+    type: [RoleResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -67,7 +71,8 @@ export class RoleController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Rôle récupéré avec succès.' 
+    description: 'Rôle récupéré avec succès.',
+    type: [RoleResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -84,7 +89,8 @@ export class RoleController {
   })
   @ApiResponse({ 
     status: 201, 
-    description: 'Rôle créé avec succès.' 
+    description: 'Rôle créé avec succès.',
+    type: [RoleResponseDto]
   })
   @ApiResponse({ 
     status: 400, 
@@ -101,7 +107,8 @@ export class RoleController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Rôle mis à jour avec succès.' 
+    description: 'Rôle mis à jour avec succès.', 
+    type: [RoleResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -122,7 +129,8 @@ export class RoleController {
    })
   @ApiResponse({ 
     status: 200, 
-    description: 'Rôle désactivé avec succès.'
+    description: 'Rôle désactivé avec succès.',
+    type: [RoleResponseDto]
   })
   @ApiResponse({
     status: 404, 
@@ -143,7 +151,8 @@ export class RoleController {
   })
   @ApiResponse({
     status: 200, 
-    description: 'Rôle restauré avec succès.' 
+    description: 'Rôle restauré avec succès.',
+    type: [RoleResponseDto]
   })
   @ApiResponse({
     status: 404, 

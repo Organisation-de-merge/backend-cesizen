@@ -1,39 +1,95 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/user.create.dto';
+import { UpdateUserDto } from './dto/user.update.dto';
 import * as bcrypt from 'bcrypt';
-import { stat } from 'fs';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
+      where: {
+        role: {
+          level: {
+            not: 100,
+          },
+        },
+      },
       include: { role: true },
     });
+  
+    return users.map(user => ({
+      id: user.id,
+      name: user.name,
+      roleId: user.roleId,
+      role: user.role,
+      isActive: user.isActive,
+    }));
   }
 
   async findAllActive() {
-    return this.prisma.user.findMany({
-      where: { isActive: true },
+    const users = await this.prisma.user.findMany({
+      where: {
+        isActive: true,
+        role: {
+          level: {
+            not: 100,
+          },
+        },
+      },
       include: { role: true },
     });
+  
+    return users.map(user => ({
+      id: user.id,
+      name: user.name,
+      roleId: user.roleId,
+      role: user.role,
+      isActive: user.isActive,
+    }));
   }
 
   async findAllInactive() {
-    return this.prisma.user.findMany({
-      where: { isActive: false },
+    const users = await this.prisma.user.findMany({
+      where: {
+        isActive: false,
+        role: {
+          level: {
+            not: 100,
+          },
+        },
+      },
       include: { role: true },
     });
+  
+    return users.map(user => ({
+      id: user.id,
+      name: user.name,
+      roleId: user.roleId,
+      role: user.role,
+      isActive: user.isActive,
+    }));
   }
 
   async findById(id: number) {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
       include: { role: true },
     });
+  
+    if (!user) {
+      throw new Error(`L'utilisateur avec l\'Id ${id} n'existe pas`);
+    }
+  
+    return {
+      id: user.id,
+      name: user.name,
+      roleId: user.roleId,
+      role: user.role,
+      isActive: user.isActive,
+    };
   }
 
   async create(dto: CreateUserDto) {
@@ -51,10 +107,6 @@ export class UserService {
 
   async update(id: number, dto: UpdateUserDto) {
     const data: any = { ...dto };
-  
-    if (dto.password) {
-      data.password = await bcrypt.hash(dto.password, 10);
-    }
   
     return this.prisma.user.update({
       where: { id },
@@ -85,10 +137,10 @@ export class UserService {
       where: { id },
     });
     if (!user) {
-      throw new Error(`User with ID ${id} not found`);
+      throw new Error(`L'utilisateur avec l\'Id ${id} n'existe pas`);
     }
     if(user.isActive === true) {
-      throw new Error(`User with ID ${id} is active and cannot be deleted`);
+      throw new Error(`L'utilisateur avec l\'Id ${id} est actif et ne peut être supprimé`);
     }
     return this.prisma.user.update({
       where: { id },

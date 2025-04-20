@@ -2,12 +2,12 @@ import { IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateRoleDto {
-  @ApiPropertyOptional({ example: 'Manager' })
+  @ApiPropertyOptional({ description: 'Nom du rôle' })
   @IsString()
   @IsOptional()
   label?: string;
 
-  @ApiPropertyOptional({ example: 80 })
+  @ApiPropertyOptional({ description: 'Niveau du rôle' })
   @IsInt()
   @IsOptional()
   level?: number;

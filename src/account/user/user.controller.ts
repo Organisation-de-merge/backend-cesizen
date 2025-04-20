@@ -1,22 +1,24 @@
-import { Body, Controller, Get, Post, Put, Delete, Param, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Put, Delete, Param, ParseIntPipe, ParseBoolPipe, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/user.create.dto';
+import { UserResponseDto } from './dto/user.response.dto';
+import { UpdateUserDto } from './dto/user.update.dto';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/getAllUsers')
+  @Get('/getUsers')
   @ApiOperation({ 
     summary: 'Lister tous les utilisateurs', 
     description: 'Récupère tous les utilisateurs de la base de données.' 
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Liste récupérée avec succès.' 
+    description: 'Liste récupérée avec succès.',
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -26,38 +28,34 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get('/getAllActiveUsers')
+  @Get('/getUsersByStatus')
   @ApiOperation({ 
-    summary: 'Lister tous les utilisateurs actifs',
-    description: 'Récupère tous les utilisateurs actifs de la base de données.' 
+    summary: 'Lister tous les utilisateurs en fonction de leur statut',
+    description: 'Récupère tous les utilisateurs en fonction de leur statut (actif/inactif).'
+  })
+  @ApiQuery({
+    name: 'isActive',
+    required: true,
+    type: Boolean,
+    description: 'Filtre les utilisateurs actifs (true) ou inactifs (false)',
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Liste récupérée avec succès.'
+    description: 'Liste récupérée avec succès.',
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
-    description: 'Aucun utilisateur actif trouvé.' 
-  })
-  findAllActive() {
-    return this.userService.findAllActive();
-  }
-
-  @Get('/getAllInactiveUsers')
-  @ApiOperation({ 
-    summary: 'Lister tous les utilisateurs inactifs',
-    description: 'Récupère tous les utilisateurs inactifs de la base de données.'
+    description: 'Aucun utilisateur trouvé.' 
   })
   @ApiResponse({ 
-    status: 200, 
-    description: 'Liste récupérée avec succès.' 
+    status: 400, 
+    description: 'Erreur de validation.'
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Aucun utilisateur inactif trouvé.' 
-  })
-  findAllInactive() {
-    return this.userService.findAllInactive();
+  findAllByStatus(@Query('isActive', ParseBoolPipe) isActive: boolean) {
+    return isActive
+      ? this.userService.findAllActive()
+      : this.userService.findAllInactive();
   }
 
   @Get('/getUserById/:id')
@@ -67,7 +65,8 @@ export class UserController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Utilisateur trouvé.' 
+    description: 'Utilisateur trouvé.', 
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -88,7 +87,8 @@ export class UserController {
   })
   @ApiResponse({ 
     status: 201, 
-    description: 'Utilisateur créé avec succès.' 
+    description: 'Utilisateur créé avec succès.', 
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 400, 
@@ -105,7 +105,8 @@ export class UserController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Utilisateur mis à jour' 
+    description: 'Utilisateur mis à jour', 
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -129,7 +130,8 @@ export class UserController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Utilisateur désactivé' 
+    description: 'Utilisateur désactivé', 
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -147,10 +149,11 @@ export class UserController {
   @ApiOperation({ 
     summary: 'Restaurer un utilisateur désactivé',
     description: 'Restaure un utilisateur désactivé dans la base de données.'
-   })
+  })
   @ApiResponse({ 
     status: 200, 
-    description: 'Utilisateur restauré' 
+    description: 'Utilisateur restauré', 
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 404, 
@@ -171,7 +174,8 @@ export class UserController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Utilisateur supprimé' 
+    description: 'Utilisateur supprimé', 
+    type: [UserResponseDto]
   })
   @ApiResponse({ 
     status: 404, 

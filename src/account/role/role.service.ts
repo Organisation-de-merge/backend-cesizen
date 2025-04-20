@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { CreateRoleDto } from './dto/role.create.dto';
+import { UpdateRoleDto } from './dto/role.update.dto';
 
 @Injectable()
 export class RoleService {
@@ -9,29 +9,74 @@ export class RoleService {
 
   findAll() {
     return this.prisma.role.findMany({
-      where: { deletedAt: null },
-      include: { users: true },
+      where: {
+        deletedAt: null,
+        level: { not: 100 },
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+            isActive: true,
+            roleId: true,
+          },
+        },
+      },
     });
   }
 
   findAllActive() {
     return this.prisma.role.findMany({
-      where: { deletedAt: null },
-      include: { users: true },
+      where: { 
+        deletedAt: null,
+        level: { not: 100 },
+      },
+      include: { 
+        users: {
+          select: {
+            id: true,
+            name: true,
+            isActive: true,
+            roleId: true,
+          },
+        },
+      },
     });
   }
 
   findAllInactive() {
     return this.prisma.role.findMany({
-      where: { deletedAt: { not: null } },
-      include: { users: true },
+      where: { 
+        deletedAt: { not: null },
+        level: { not: 100 },
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+            isActive: true,
+            roleId: true,
+          },
+        },
+      },
     });
   }
 
   findById(id: number) {
     return this.prisma.role.findUnique({
       where: { id },
-      include: { users: true },
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+            isActive: true,
+            roleId: true,
+          },
+        },
+      },
     });
   }
 
