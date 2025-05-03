@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+///////////////////////////////
+// Module Compte utilisateur //
+///////////////////////////////
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String
+  password  String
+  roleId    Int
+  role      Role      @relation("roleUser", fields: [roleId], references: [id])
+  isActive  Boolean   @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+
+  favorites Favorite[]
+}
+
+model Role {
+  id        Int       @id @default(autoincrement())
+  label     String
+  level     Int
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+  users     User[]    @relation("roleUser")
+}
+
+///////////////////////////////
+// Module Page d'information //
+///////////////////////////////
+
+model InformationPage {
+  id          Int        @id @default(autoincrement())
+  title       String
+  content     String
+  thumbnail   String?
+  status      PageStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model InformationMenu {
+  id        Int      @id @default(autoincrement())
+  label     String
+  pageIds   Int[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PageStatus {
+  DRAFT
+  HIDDEN
+  PUBLISHED
+}
+
+//////////////////////
+// Module Activités //
+//////////////////////
+
+model ActivityType {
+  id         Int        @id @default(autoincrement())
+  label      String
+  activities Activity[]
+}
+
+model Activity {
+  id              Int            @id @default(autoincrement())
+  name            String
+  description     String
+  thumbnail       String?
+  publicationDate DateTime?
+  duration        Int
+  stressLevel     Int
+  status          ActivityStatus @default(DRAFT)
+
+  typeId    Int
+  type      ActivityType @relation(fields: [typeId], references: [id])
+  favorites Favorite[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ActivityStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+model Favorite {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  activityId Int
+  addDate    DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  activity Activity @relation(fields: [activityId], references: [id])
+
+  @@unique([userId, activityId])
+}
