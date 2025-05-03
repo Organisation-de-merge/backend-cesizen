@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Delete, UseGuards, Query, DefaultValuePipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { PageService } from './page.service';
 import { CreatePageDto } from './dto/page.create.dto';
 import { UpdatePageDto } from './dto/page.update.dto';
@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
 import { RolesGuard } from '../../common/guard/role.guard';
 import { MinRoleLevel } from '../../common/decorators/roles.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { count } from 'console';
 
 @ApiTags('Pages')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class PageController {
   constructor(private readonly pageService: PageService) {}
 
-  @Get('/pages')
+  @Get()
   @ApiOperation({ 
     summary: 'Lister toutes les pages',
     description: 'Récupère toutes les pages d’information disponibles.'
@@ -29,29 +30,39 @@ export class PageController {
     status: 404, 
     description: 'Aucune page trouvée.' 
   })
-  findAll() {
-    return this.pageService.findAll();
+  @ApiQuery({ name: 'status', required: false, enum: ['PUBLISHED', 'DRAFT', 'HIDDEN'] })
+  @ApiQuery({ name: 'query', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  findAll(
+    @Query('status') status: string = 'PUBLISHED',
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('query') query?: string,
+    @Query('limit') limit?: number,
+  ) {
+    return this.pageService.findAll(query, limit, page, status);
   }
 
-  @Get('/pages/published')
-  @ApiOperation({ 
-    summary: 'Lister uniquement les pages publiées',
-    description: 'Récupère uniquement les pages d’information qui sont publiées.'
-  })
-  @ApiResponse({ 
-      status: 200, 
-      description: 'Liste des pages publiées récupérée avec succès.', 
-      type: [ResponsePageDto]
+  @Get('latest')
+  @ApiOperation({
+    summary: 'Obtenir les dernières pages publiées',
+    description: 'Récupère les dernières pages publiées, avec un nombre maximum spécifié.'
   })
   @ApiResponse({
-      status: 404, 
-      description: 'Aucune page publiée trouvée.' 
+    status: 200, 
+    description: 'Dernières pages récupérées.', 
+    type: [ResponsePageDto] 
   })
-  findPublished() {
-    return this.pageService.findPublished();
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Aucune page trouvée.' 
+  })
+  findLatest(@Query('count') count: string) {
+    const limit = parseInt(count, 10) || 5;
+    return this.pageService.findLatest(limit);
   }
 
-  @Get('/informtion-pages/:id')
+  @Get('/:id')
   @ApiOperation({ 
     summary: 'Obtenir une page par ID',
     description: 'Récupère une page d’information spécifique en fonction de son ID.'
@@ -71,7 +82,7 @@ export class PageController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Post('/pages/createPage')
+  @Post('/createPage')
   @ApiOperation({ 
     summary: 'Créer une page d’information',
     description: 'Crée une nouvelle page d’information dans le système.'
@@ -90,7 +101,7 @@ export class PageController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Put('/pages/:id')
+  @Put('/:id')
   @ApiOperation({ 
     summary: 'Modifier une page',
     description: 'Met à jour les informations d’une page d’information existante.'
@@ -110,7 +121,7 @@ export class PageController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Delete('/pages/:id')
+  @Delete('/:id')
   @ApiOperation({ 
     summary: 'Supprimer une page',
     description: 'Supprime une page d’information spécifique en fonction de son ID.'
