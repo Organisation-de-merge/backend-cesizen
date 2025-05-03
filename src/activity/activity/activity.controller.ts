@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, Query, DefaultValuePipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/activity.create.dto';
 import { UpdateActivityDto } from './dto/activity.update.dto';
@@ -10,6 +10,7 @@ import { MinRoleLevel } from 'src/common/decorators/roles.decorator';
 import { ActivityStatus } from './dto/activity.create.dto';
 
 @ApiTags('Activities')
+@ApiBearerAuth()
 @Controller('activities')
 export class ActivityController {
   constructor(private readonly service: ActivityService) {}
@@ -36,9 +37,9 @@ export class ActivityController {
   @ApiQuery({ name: 'stressLevel', required: false, type: Number })
   findAll(
     @Query('status') status: string = 'PUBLISHED',
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('page', new DefaultValuePipe(1)) page: number,
     @Query('query') query?: string,
-    @Query('limit', ParseIntPipe) limit?: number,
+    @Query('limit') limit?: number,
     @Query('typeId', new DefaultValuePipe(undefined)) typeId?: number,
     @Query('stressLevel', new DefaultValuePipe(undefined)) stressLevel?: number,
   ) {
