@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, Query, DefaultValuePipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, Query, DefaultValuePipe, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/activity.create.dto';
 import { UpdateActivityDto } from './dto/activity.update.dto';
@@ -8,6 +8,9 @@ import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { MinRoleLevel } from 'src/common/decorators/roles.decorator';
 import { ActivityStatus } from './dto/activity.create.dto';
+import { ParseOptionalIntPipe } from 'src/common/pipe/parse-optional-int.pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/config/multer.config';
 
 @ApiTags('Activities')
 @ApiBearerAuth()
@@ -37,11 +40,11 @@ export class ActivityController {
   @ApiQuery({ name: 'stressLevel', required: false, type: Number })
   findAll(
     @Query('status') status: string = 'PUBLISHED',
-    @Query('page', new DefaultValuePipe(1)) page: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('query') query?: string,
-    @Query('limit') limit?: number,
-    @Query('typeId', new DefaultValuePipe(undefined)) typeId?: number,
-    @Query('stressLevel', new DefaultValuePipe(undefined)) stressLevel?: number,
+    @Query('limit', ParseOptionalIntPipe) limit?: number,
+    @Query('typeId', ParseOptionalIntPipe) typeId?: number,
+    @Query('stressLevel', ParseOptionalIntPipe) stressLevel?: number,
   ) {
     return this.service.findAll(query, limit, page, typeId, stressLevel, status);
   }
@@ -83,43 +86,92 @@ export class ActivityController {
     return this.service.findOne(id);
   }
 
+  @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Post()
-  @ApiOperation({ 
-    summary: 'Créer une activité',
-    description: 'Crée une nouvelle activité dans la base de données.'
+  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Créer une activité avec image' })
+  @ApiBody({
+    description: 'Créer une activité avec image',
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        duration: { type: 'integer' },
+        stressLevel: { type: 'integer' },
+        typeId: { type: 'integer' },
+        status: { type: 'string', enum: ['DRAFT', 'PUBLISHED', 'HIDDEN'] },
+        thumbnail: { type: 'string', format: 'binary' },
+      },
+    },
   })
-  @ApiResponse({
-    status: 201,
-    description: 'Activité créée avec succès.',
-    type: ResponseActivityDto,
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Activité créée avec succès.', 
+    type: ResponseActivityDto 
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Erreur de validation.',
-  })
-  create(@Body() dto: CreateActivityDto) {
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+  ) {
+    const dto = new CreateActivityDto();
+
+    dto.name = body.name;
+    dto.description = body.description;
+    dto.duration = parseInt(body.duration, 10);
+    dto.stressLevel = parseInt(body.stressLevel, 10);
+    dto.typeId = parseInt(body.typeId, 10);
+    dto.status = body.status;
+    dto.publicationDate = body.publicationDate ? new Date(body.publicationDate) : undefined;
+    dto.thumbnail = file ? `/uploads/activities/${file.filename}` : undefined;
+
     return this.service.create(dto);
   }
 
+  @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Put(':id')
-  @ApiOperation({ 
-    summary: 'Mettre à jour une activité',
-    description: 'Met à jour les informations d\'une activité existante.'
+  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Mettre à jour une activité avec image' })
+  @ApiBody({
+    description: 'Mettre à jour une activité avec image',
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        duration: { type: 'integer' },
+        stressLevel: { type: 'integer' },
+        typeId: { type: 'integer' },
+        status: { type: 'string', enum: ['DRAFT', 'PUBLISHED', 'HIDDEN'] },
+        thumbnail: { type: 'string', format: 'binary' },
+      },
+    },
   })
   @ApiResponse({
     status: 200,
     description: 'Activité mise à jour avec succès.',
     type: ResponseActivityDto,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Aucune activité trouvée avec cet ID.',
-  })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateActivityDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+  ) {
+    const dto = new UpdateActivityDto();
+
+    dto.name = body.name;
+    dto.description = body.description;
+    dto.duration = parseInt(body.duration, 10);
+    dto.stressLevel = parseInt(body.stressLevel, 10);
+    dto.typeId = parseInt(body.typeId, 10);
+    dto.status = body.status;
+    dto.publicationDate = body.publicationDate ? new Date(body.publicationDate) : undefined;
+    dto.thumbnail = file ? `/uploads/activities/${file.filename}` : undefined;
+
     return this.service.update(id, dto);
   }
 

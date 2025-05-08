@@ -58,18 +58,10 @@ async function main() {
     });
   }
 
-  await prisma.informationPage.create({
-    data: {
-      title: 'Bienvenue sur CesiZen',
-      content: 'Voici notre première page.',
-      status: 'PUBLISHED',
-    },
-  });
-
   await prisma.informationMenu.create({
     data: {
       label: 'Menu Principal',
-      pageIds: [1],
+      pageIds: [],
     },
   });
 
@@ -78,46 +70,6 @@ async function main() {
       { label: 'Yoga' },
       { label: 'Méditation' },
       { label: 'Respiration' },
-    ],
-    skipDuplicates: true,
-  });
-
-  await prisma.activity.createMany({
-    data: [
-      {
-        name: 'Yoga Matinal',
-        description: 'Séance de yoga pour bien commencer la journée.',
-        thumbnail: 'yoga.jpg',
-        duration: 30,
-        stressLevel: 2,
-        status: 'PUBLISHED',
-        typeId: 1,
-        publicationDate: new Date(),
-      },
-      {
-        name: 'Méditation guidée',
-        description: 'Détente mentale et relaxation profonde.',
-        thumbnail: 'meditation.jpg',
-        duration: 15,
-        stressLevel: 1,
-        status: 'PUBLISHED',
-        typeId: 2,
-        publicationDate: new Date(),
-      },
-    ],
-    skipDuplicates: true,
-  });
-
-  await prisma.favorite.createMany({
-    data: [
-      {
-        userId: 3, 
-        activityId: 1,
-      },
-      {
-        userId: 4, 
-        activityId: 2,
-      },
     ],
     skipDuplicates: true,
   });

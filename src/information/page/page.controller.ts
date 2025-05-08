@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Delete, UseGuards, Query, DefaultValuePipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { PageService } from './page.service';
 import { CreatePageDto } from './dto/page.create.dto';
 import { UpdatePageDto } from './dto/page.update.dto';
@@ -8,6 +8,10 @@ import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
 import { RolesGuard } from '../../common/guard/role.guard';
 import { MinRoleLevel } from '../../common/decorators/roles.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ParseOptionalIntPipe } from '../../common/pipe/parse-optional-int.pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/config/multer.config'; 
+import { UseInterceptors, UploadedFile, Req } from '@nestjs/common';
 
 @ApiTags('Pages')
 @ApiBearerAuth()
@@ -37,7 +41,7 @@ export class PageController {
     @Query('status') status: string = 'PUBLISHED',
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('query') query?: string,
-    @Query('limit') limit?: number,
+    @Query('limit', ParseOptionalIntPipe ) limit?: number,
   ) {
     return this.pageService.findAll(query, limit, page, status);
   }
@@ -79,42 +83,83 @@ export class PageController {
     return this.pageService.findById(id);
   }
 
+  @Post('/createPage')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Post('/createPage')
-  @ApiOperation({ 
-    summary: 'Créer une page d’information',
-    description: 'Crée une nouvelle page d’information dans le système.'
+  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Créer une page avec image' })
+  @ApiBody({
+    description: 'Créer une page avec image',
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        content: { type: 'string' },
+        status: { type: 'string', enum: ['DRAFT', 'PUBLISHED', 'HIDDEN'] },
+        thumbnail: { type: 'string', format: 'binary' },
+      },
+    },
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Page créée avec succès.', 
-    type: [ResponsePageDto]})
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Erreur de validation.' 
+  @ApiResponse({
+    status: 201,
+    description: 'Page créée avec succès.',
+    type: ResponsePageDto,
   })
-  create(@Body() dto: CreatePageDto) {
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+  ) {
+
+    const dto = new CreatePageDto();
+
+    dto.title = body.title;
+    dto.content = body.content;
+    dto.status = body.status;
+    dto.thumbnail = file ? `/uploads/pages/${file.filename}` : undefined;
+
     return this.pageService.create(dto);
   }
 
+  @Put('/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Put('/:id')
-  @ApiOperation({ 
-    summary: 'Modifier une page',
-    description: 'Met à jour les informations d’une page d’information existante.'
+  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Modifier une page avec image' })
+  @ApiBody({
+    description: 'Modifier une page avec image',
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        content: { type: 'string' },
+        status: { type: 'string', enum: ['DRAFT', 'PUBLISHED', 'HIDDEN'] },
+        thumbnail: { type: 'string', format: 'binary' },
+      },
+    },
   })
-  @ApiResponse({ 
-      status: 200, 
-      description: 'Page mise à jour avec succès.', 
-      type: [ResponsePageDto]
+  @ApiResponse({
+    status: 200,
+    description: 'Page mise à jour avec succès.',
+    type: [ResponsePageDto],
   })
-  @ApiResponse({ 
-          status: 404, 
-          description: 'Page introuvable.' 
+  @ApiResponse({
+    status: 404,
+    description: 'Page introuvable.',
   })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePageDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+  ) {
+  
+    const dto = new UpdatePageDto();
+    dto.title = body.title;
+    dto.content = body.content;
+    dto.status = body.status;
+    dto.thumbnail = file ? `/uploads/pages/${file.filename}` : undefined;
+  
     return this.pageService.update(id, dto);
   }
 

@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
 import { RolesGuard } from '../../common/guard/role.guard';
 import { MinRoleLevel } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -218,37 +219,37 @@ export class ProfileController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Get('/profil')
+  @Get()
   @ApiOperation({ summary: 'Voir son propre profil' })
   @ApiResponse({ status: 200, description: 'Données utilisateur récupérées' })
   getProfile(@CurrentUser() user) {
-    return this.userService.findById(user.id);
+    return this.userService.profil(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Put('/profil/update')
+  @Put('/update')
   @ApiOperation({ summary: 'Mettre à jour ses informations personnelles' })
   @ApiResponse({ status: 200, description: 'Infos mises à jour' })
   updateMe(@CurrentUser() user, @Body() dto: UpdateUserDto) {
     return this.userService.update(user.id, dto);
   }
 
+  @Patch('/change-password')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Patch('/profil/change-password')
   @ApiOperation({ summary: 'Changer son mot de passe' })
   @ApiResponse({ status: 200, description: 'Mot de passe modifié' })
   async changePassword(
     @CurrentUser() user,
-    @Body() body: { oldPassword: string; newPassword: string },
+    @Body() dto: ChangePasswordDto,
   ) {
-    return this.userService.changePassword(user.id, body.oldPassword, body.newPassword);
+    return this.userService.changePassword(user.id, dto.oldPassword, dto.newPassword);
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Delete('/profil/delete')
+  @Delete('/delete')
   @ApiOperation({ summary: 'Supprimer définitivement son compte' })
   @ApiResponse({ status: 200, description: 'Compte supprimé' })
   deleteSelf(@CurrentUser() user) {

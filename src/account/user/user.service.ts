@@ -177,4 +177,26 @@ export class UserService {
       data: { password: newHash },
     });
   }
+
+  async profil(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { role: true },
+    });
+  
+    if (!user) {
+      throw new Error(`L'utilisateur avec l'ID ${id} n'existe pas.`);
+    }
+  
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      roleId: user.roleId,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      deletedAt: user.deletedAt,
+    };
+  }
 }
