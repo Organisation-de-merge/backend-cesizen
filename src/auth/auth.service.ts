@@ -1,13 +1,16 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { MailService } from '../mail/mail.service';
+import { addMinutes } from 'date-fns';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -16,11 +19,15 @@ export class AuthService {
       include: { role: true },
     });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('Identifiants invalides');
-    }
-
-    return user;
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        throw new UnauthorizedException('Identifiants invalides');
+      }
+  
+      return user;
+  }
+  
+  private generateResetCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString(); 
   }
 
   async login(user: any) {
@@ -66,5 +73,52 @@ export class AuthService {
     });
 
     return this.login(user);
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) throw new NotFoundException('Utilisateur non trouvé.');
+  
+    const resetCode = this.generateResetCode();
+    const expiry = addMinutes(new Date(), 15);
+  
+    await this.prisma.user.update({
+      where: { email },
+      data: {
+        resetToken: resetCode,
+        resetTokenExpiry: expiry,
+      },
+    });
+  
+    await this.mailService.sendResetCode(email, resetCode);
+      return { message: 'Code de réinitialisation envoyé par email.' };
+    }
+
+    async resetPassword(code: string, newPassword: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetToken: code,
+        resetTokenExpiry: {
+          gte: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Code invalide ou expiré.');
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashed,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+
+    return { message: 'Mot de passe réinitialisé avec succès.' };
   }
 }

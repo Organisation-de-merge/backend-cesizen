@@ -16,7 +16,7 @@ export class MenuController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Post('/menus/create')
+  @Post('/create')
   @ApiOperation({ 
     summary: 'Créer un menu d’informations',
     description: 'Crée un nouveau menu d’informations.'
@@ -34,7 +34,7 @@ export class MenuController {
     return this.menuService.create(dto);
   }
 
-  @Get('/menus')
+  @Get()
   @ApiOperation({ 
     summary: 'Lister tous les menus',
     description: 'Récupère tous les menus d’informations de la base de données.'
@@ -52,7 +52,7 @@ export class MenuController {
     return this.menuService.findAll();
   }
 
-  @Get('/menus/:id')
+  @Get('/:id')
   @ApiOperation({ 
     summary: 'Récupérer un menu par ID avec les pages liées',
     description: 'Récupère un menu d’informations par son ID, y compris les pages qui lui sont liées.'
@@ -72,7 +72,7 @@ export class MenuController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Put('/menus/:id')
+  @Put('/:id')
   @ApiOperation({ 
     summary: 'Modifier un menu',
     description: 'Met à jour les informations d’un menu d’informations existant.'
@@ -92,7 +92,7 @@ export class MenuController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @MinRoleLevel(100)
-  @Delete('/menus/:id')
+  @Delete('/:id')
   @ApiOperation({ 
     summary: 'Supprimer un menu',
     description: 'Supprime un menu d’informations de la base de données.'

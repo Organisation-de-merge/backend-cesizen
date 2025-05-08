@@ -26,7 +26,7 @@ export class ActivityService {
       throw new BadRequestException('Le numéro de page doit être supérieur ou égal à 1.');
     }
   
-    const filters: Prisma.ActivityWhereInput = {
+    const filters = {
       status: status.toUpperCase() as any,
       AND: [
         query

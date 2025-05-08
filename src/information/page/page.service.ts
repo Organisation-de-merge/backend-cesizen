@@ -8,7 +8,13 @@ export class PageService {
   constructor(private prisma: PrismaService) {}
 
   create(dto: CreatePageDto) {
-    return this.prisma.informationPage.create({ data: dto });
+    const data: any = { ...dto };
+  
+    if (dto.status?.toUpperCase() === 'PUBLISHED') {
+      data.publishedAt = new Date();
+    }
+  
+    return this.prisma.informationPage.create({ data });
   }
 
   async findAll(
@@ -49,7 +55,7 @@ export class PageService {
     const currentPage = Math.min(page, totalPages);
     const skip = (currentPage - 1) * limit;
 
-    const items = this.prisma.informationPage.findMany({
+    const items = await this.prisma.informationPage.findMany({
       where: filters,
       orderBy: { publishedAt: 'desc' },
       skip,
@@ -72,7 +78,7 @@ export class PageService {
   findLatest(limit: number) {
     return this.prisma.informationPage.findMany({
       where: { status: 'PUBLISHED' },
-      orderBy: { publishedAt: 'desc' },
+      orderBy: { publishedAt: 'asc' },
       take: limit,
     });
   }
