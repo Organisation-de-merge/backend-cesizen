@@ -11,7 +11,7 @@ import { MinRoleLevel } from '../../common/decorators/roles.decorator';
 
 @ApiTags('Activity Types')
 @ApiBearerAuth()
-@Controller('activities/types')
+@Controller('activity-types')
 export class ActivityTypeController {
   constructor(private readonly service: ActivityTypeService) {}
 

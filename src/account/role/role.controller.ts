@@ -18,7 +18,7 @@ import { UseGuards } from '@nestjs/common';
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
-  @Get('/getAllRoles')
+  @Get('')
   @ApiOperation({ 
     summary: 'Lister les rôles actifs',
     description: 'Récupère tous les rôles actifs de la base de données.'
@@ -36,7 +36,7 @@ export class RoleController {
     return this.roleService.findAll();
   }
 
-  @Get('/getAllActiveRoles')
+  @Get('/active')
   @ApiOperation({ 
     summary: 'Lister les rôles actifs',
     description: 'Récupère tous les rôles actifs de la base de données.'
@@ -54,7 +54,7 @@ export class RoleController {
     return this.roleService.findAllActive();
   }
 
-  @Get('/getAllInactiveRoles')
+  @Get('/inactive')
   @ApiOperation({ 
     summary: 'Lister les rôles inactifs',
     description: 'Récupère tous les rôles inactifs de la base de données.'
@@ -72,7 +72,7 @@ export class RoleController {
     return this.roleService.findAllInactive();
   }
 
-  @Get('/getRoleById/:id')
+  @Get('/:id')
   @ApiOperation({ 
     summary: 'Récupérer un rôle par ID',
     description: 'Récupère un rôle spécifique en fonction de son ID.'
@@ -90,7 +90,7 @@ export class RoleController {
     return this.roleService.findById(id);
   }
 
-  @Post('/createRole')
+  @Post('')
   @ApiOperation({ 
     summary: 'Créer un rôle',
     description: 'Crée un nouveau rôle dans la base de données.'
@@ -108,7 +108,7 @@ export class RoleController {
     return this.roleService.create(dto);
   }
 
-  @Put(':id')
+  @Put('/:id')
   @ApiOperation({ 
     summary: 'Modifier un rôle',
     description: 'Met à jour un rôle existant en fonction de son ID.'
