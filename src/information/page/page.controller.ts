@@ -85,7 +85,7 @@ export class PageController {
 
   @Post('/createPage')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @MinRoleLevel(100)
+  @MinRoleLevel(60)
   @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Créer une page avec image' })
@@ -123,7 +123,7 @@ export class PageController {
 
   @Put('/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @MinRoleLevel(100)
+  @MinRoleLevel(60)
   @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Modifier une page avec image' })

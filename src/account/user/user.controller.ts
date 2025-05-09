@@ -93,7 +93,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @MinRoleLevel(100)
+  @MinRoleLevel(80)
   @Post('/createUser')
   @ApiOperation({ 
     summary: 'Créer un nouvel utilisateur',
@@ -113,7 +113,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @MinRoleLevel(100)
+  @MinRoleLevel(80)
   @Put('/updateUser/:id')
   @ApiOperation({ 
     summary: 'Modifier un utilisateur',

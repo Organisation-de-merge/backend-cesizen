@@ -88,7 +88,7 @@ export class ActivityController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @MinRoleLevel(100)
+  @MinRoleLevel(60)
   @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Créer une activité avec image' })
@@ -132,7 +132,7 @@ export class ActivityController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @MinRoleLevel(100)
+  @MinRoleLevel(60)
   @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Mettre à jour une activité avec image' })

@@ -25,6 +25,7 @@ export class UserService {
     return users.map(user => ({
       id: user.id,
       name: user.name,
+      email: user.email,
       roleId: user.roleId,
       role: user.role,
       isActive: user.isActive,
@@ -49,6 +50,7 @@ export class UserService {
     return users.map(user => ({
       id: user.id,
       name: user.name,
+      email: user.email,
       roleId: user.roleId,
       role: user.role,
       isActive: user.isActive,
@@ -73,6 +75,7 @@ export class UserService {
     return users.map(user => ({
       id: user.id,
       name: user.name,
+      email: user.email,
       roleId: user.roleId,
       role: user.role,
       isActive: user.isActive,
@@ -92,6 +95,7 @@ export class UserService {
     return {
       id: user.id,
       name: user.name,
+      email: user.email,
       roleId: user.roleId,
       role: user.role,
       isActive: user.isActive,

@@ -11,6 +11,10 @@ export class UserResponseDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ description: "Email de l'utilisateur" })
+  @IsString()
+  email: string;
+
   @ApiProperty({ description: "Identifiant du rôle utilisateur" })
   @IsInt()
   roleId: number;

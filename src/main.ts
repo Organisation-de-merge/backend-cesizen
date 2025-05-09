@@ -7,6 +7,12 @@ import { resolve, join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   app.useStaticAssets(resolve(process.cwd(), 'uploads'), {
     prefix: '/uploads/',
   });
