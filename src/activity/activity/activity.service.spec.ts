@@ -44,10 +44,25 @@ describe('ActivityService', () => {
     expect(mockPrisma.activity.create).toHaveBeenCalled();
   });
 
+  it('should find all activities', async () => {
+    await service.findAll();
+    expect(mockPrisma.activity.findMany).toHaveBeenCalledWith({
+      include: { type: true },
+    });
+  });
+
   it('should find an activity by id', async () => {
     await service.findOne(1);
     expect(mockPrisma.activity.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
+      include: { type: true },
+    });
+  });
+
+  it('should find the 5 last activity', async () => {
+    await service.findLatest(5);
+    expect(mockPrisma.activity.findUnique).toHaveBeenCalledWith({
+      where: { limit: 5 },
       include: { type: true },
     });
   });

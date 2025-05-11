@@ -3,18 +3,20 @@ import { ActivityController } from './activity.controller';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/activity.create.dto';
 import { UpdateActivityDto } from './dto/activity.update.dto';
+import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guard/role.guard';
 
 describe('ActivityController', () => {
   let controller: ActivityController;
   let service: ActivityService;
 
   const mockService = {
-    findAll: jest.fn(),
-    findLatest: jest.fn(),
-    findOne: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
+    findAll: jest.fn().mockResolvedValue([]),
+    findLatest: jest.fn().mockResolvedValue([]),
+    findOne: jest.fn().mockResolvedValue([]),
+    create: jest.fn().mockResolvedValue([]),
+    update: jest.fn().mockResolvedValue([]),
+    delete: jest.fn().mockResolvedValue([]),
   };
 
   beforeEach(async () => {
@@ -23,7 +25,12 @@ describe('ActivityController', () => {
       providers: [
         { provide: ActivityService, useValue: mockService },
       ],
-    }).compile();
+    })
+    .overrideGuard(JwtAuthGuard)
+    .useValue({ canActivate: jest.fn(() => true) })
+    .overrideGuard(RolesGuard)
+    .useValue({ canActivate: jest.fn(() => true) })
+    .compile();
 
     controller = module.get<ActivityController>(ActivityController);
     service = module.get<ActivityService>(ActivityService);
