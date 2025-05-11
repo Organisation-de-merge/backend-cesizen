@@ -9,12 +9,17 @@ describe('UserController', () => {
 
   const mockUserService = {
     findAll: jest.fn().mockResolvedValue([]),
+    findAllByStatus: jest.fn().mockResolvedValue([]),
     findById: jest.fn().mockImplementation(id => Promise.resolve({ id })),
     create: jest.fn().mockImplementation(dto => Promise.resolve({ id: 1, ...dto })),
     update: jest.fn().mockImplementation((id, dto) => Promise.resolve({ id, ...dto })),
     disable: jest.fn().mockResolvedValue({}),
     restore: jest.fn().mockResolvedValue({}),
-    delete: jest.fn().mockResolvedValue({}),
+    delete: jest.fn().mockResolvedValue(id => Promise.resolve({ id })),
+    deleteUser: jest.fn().mockResolvedValue(id => Promise.resolve({ id })),
+    getProfile: jest.fn().mockResolvedValue({}),
+    updateMe: jest.fn().mockResolvedValue({}),
+    deleteSelf: jest.fn().mockResolvedValue({}),
     changePassword: jest.fn().mockResolvedValue({}),
     profil: jest.fn().mockImplementation(id => Promise.resolve({ id })),
   };
