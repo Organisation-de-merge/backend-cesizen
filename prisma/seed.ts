@@ -10,35 +10,36 @@ async function main() {
     data: [
       { id: 1, label: 'Administrateur', level: 100 },
       { id: 2, label: 'Modérateur', level: 80 },
-      { id: 3, label: 'Utilisateur', level: 1 },
+      { id: 3, label: 'Auteur', level: 60 },
+      { id: 4, label: 'Utilisateur', level: 1 },
     ],
     skipDuplicates: true,
   });
 
   const users = [
     {
-      name: 'Admin Principal',
+      name: 'Admin CESIZEN',
       email: 'admin@cesizen.fr',
       password: 'admin123',
       roleId: 1,
     },
     {
-      name: 'Modérateur Test',
+      name: 'Modérateur',
       email: 'mod@cesizen.fr',
       password: 'mod123',
       roleId: 2,
     },
     {
-      name: 'Utilisateur Standard',
-      email: 'user1@cesizen.fr',
-      password: 'user123',
+      name: 'Auteur',
+      email: 'author@cesizen.fr',
+      password: 'author123',
       roleId: 3,
     },
     {
-      name: 'Utilisateur Extra',
-      email: 'user2@cesizen.fr',
+      name: 'Utilisateur',
+      email: 'user@cesizen.fr',
       password: 'user123',
-      roleId: 3,
+      roleId: 4,
     },
   ];
 
