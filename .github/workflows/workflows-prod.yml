@@ -92,7 +92,7 @@ jobs:
     if: ${{ github.ref_name == 'main' }}
     environment: 
       name: prod
-      url: http://ec2-34-224-12-85.compute-1.amazonaws.com/
+      url: http://ec2-54-225-54-84.compute-1.amazonaws.com/
     needs: push-build-to-docker
     steps: 
       - name: Déploiement du conteneur Docker via SSH
