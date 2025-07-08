@@ -89,7 +89,7 @@ jobs:
 
   deploy-docker-prod:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'main' }}
+    if: ${{ github.ref_name == 'main' }}
     environment: 
       name: prod
       url: http://ec2-34-224-12-85.compute-1.amazonaws.com/
