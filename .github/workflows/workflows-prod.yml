@@ -93,7 +93,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    environement: 
+    environment: 
       name: prod
       url: http://ec2-34-224-12-85.compute-1.amazonaws.com/
     needs: push-build-to-docker
