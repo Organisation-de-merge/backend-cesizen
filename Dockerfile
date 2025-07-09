@@ -17,4 +17,4 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 
 ENTRYPOINT [ "entrypoint" ]
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/src/main.js"] 
