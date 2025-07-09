@@ -28,7 +28,8 @@ jobs:
 
   push-build-to-docker:
     needs: 
-      - build
+      - unit-tests
+      - audit
     runs-on: ubuntu-latest
     permissions:
       contents: read
